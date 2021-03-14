@@ -3,7 +3,7 @@ import { diskStorage } from 'multer';
 
 export const storageFactory = (folder: string) =>
   diskStorage({
-    destination: 'dist/uploads/' + folder,
+    destination: './uploads/' + folder,
     filename: (req, file, cb) => {
       // Generating a 32 random chars long string
       const randomName = Array(32)

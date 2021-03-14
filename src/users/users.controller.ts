@@ -116,7 +116,7 @@ export class UsersController {
   ) {
     return this.usersService.update(id, {
       ...updateUser,
-      avatar: __dirname + '\\' + file.path,
+      avatar: file.path,
     });
   }
 
