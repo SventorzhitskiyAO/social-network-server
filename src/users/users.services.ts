@@ -31,6 +31,7 @@ export class UsersService {
   }
 
   async update(id: string, user: any): Promise<User> {
+    console.log(user);
     return this.userModel.findByIdAndUpdate(
       id,
       { $set: { ...user } },

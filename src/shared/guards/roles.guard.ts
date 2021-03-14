@@ -4,7 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import { UserRoles } from '../constants/users-role.enum';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../schemas/user.schema';
+import { User, UserDocument } from '../../schemas/user.schema';
 import { Model } from 'mongoose';
 
 @Injectable()

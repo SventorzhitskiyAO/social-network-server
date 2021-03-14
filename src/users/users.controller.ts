@@ -6,24 +6,27 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { UsersService } from './users.services';
 import { User } from '../schemas/user.schema';
-import { Roles } from '../decorators/roles.decorators';
-import { UserRoles } from '../constants/users-role.enum';
-import { UsersGuards } from '../guards/users.guards';
-import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../shared/decorators/roles.decorators';
+import { UserRoles } from '../shared/constants/users-role.enum';
+import { RolesGuard } from '../shared/guards/roles.guard';
 import { UserDto } from './dto/user.dto';
 import { UpdateUsersDto } from './dto/update-users.dto';
 import { CreateUsersDto } from './dto/create-users.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { storageFactory } from '../shared/mullter/storage.factory';
 
 @Controller('users')
-@ApiTags('user')
+@ApiTags('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -37,9 +40,6 @@ export class UsersController {
     return this.usersService.getAll();
   }
 
-  // @Roles(UserRoles.Admin, UserRoles.User)
-  // @UseGuards(UsersGuards)
-  // @UseGuards(RolesGuard)
   @Get(':id')
   @ApiResponse({
     status: 200,
@@ -89,9 +89,12 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 
-  @Roles(UserRoles.Admin, UserRoles.User)
-  @UseGuards(RolesGuard)
   @Put(':id')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: storageFactory('users-avatar'),
+    }),
+  )
   @ApiResponse({
     status: 201,
     description: 'Update and get new user',
@@ -106,9 +109,15 @@ export class UsersController {
   })
   update(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) updateUser: UpdateUsersDto,
-  ): Promise<User> {
-    return this.usersService.update(id, updateUser);
+    @Body()
+    updateUser: // new ValidationPipe()
+    UpdateUsersDto,
+    @UploadedFile() file,
+  ) {
+    return this.usersService.update(id, {
+      ...updateUser,
+      avatar: __dirname + '\\' + file.path,
+    });
   }
 
   @Post('/userName')

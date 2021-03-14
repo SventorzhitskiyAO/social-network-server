@@ -6,7 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Match } from '../../decorators/match.decorator';
+import { Match } from '../../shared/decorators/match.decorator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUsersDto {

@@ -1,9 +1,10 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { UsersGuards } from '../guards/users.guards';
+import { UsersGuards } from '../shared/guards/users.guards';
 import { UserDto } from '../users/dto/user.dto';
 import { AuthServices } from './auth.services';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -35,8 +36,8 @@ export class AuthController {
     status: 404,
     description: 'Not found',
   })
-  // @ApiBody({ type: LoginDto })
-  login(@Body() loginBody) {
+  @ApiBody({ type: LoginDto })
+  login(@Body() loginBody): Promise<LoginDto> {
     return this.service.login(loginBody);
   }
 }

@@ -21,4 +21,22 @@ export class UserDto {
 
   @ApiProperty()
   password: string;
+
+  @ApiProperty()
+  facebook: string;
+
+  @ApiProperty()
+  vk: string;
+
+  @ApiProperty()
+  github: string;
+
+  @ApiProperty()
+  instagram: string;
+
+  @ApiProperty()
+  skill: string;
+
+  @ApiProperty()
+  aboutMe: string;
 }
