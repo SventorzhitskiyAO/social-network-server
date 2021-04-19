@@ -12,6 +12,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { storageFactory } from '../shared/mullter/storage.factory';
 
 import { UsersService } from './users.services';
 import { User } from '../schemas/user.schema';
@@ -22,8 +24,6 @@ import { UserDto } from './dto/user.dto';
 import { UpdateUsersDto } from './dto/update-users.dto';
 import { CreateUsersDto } from './dto/create-users.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { storageFactory } from '../shared/mullter/storage.factory';
 
 @Controller('users')
 @ApiTags('users')
@@ -64,12 +64,7 @@ export class UsersController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Get new users',
     type: UserDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Not found',
   })
   create(@Body(new ValidationPipe()) user: CreateUsersDto): Promise<User> {
     return this.usersService.create(user);
@@ -81,20 +76,11 @@ export class UsersController {
   @ApiResponse({
     status: 200,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Not found',
-  })
   remove(@Param('id') id: string): Promise<User> {
     return this.usersService.remove(id);
   }
 
   @Put(':id')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: storageFactory('users-avatar'),
-    }),
-  )
   @ApiResponse({
     status: 201,
     description: 'Update and get new user',
@@ -107,17 +93,20 @@ export class UsersController {
   @ApiBody({
     type: UpdateUsersDto,
   })
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: storageFactory('users-avatar'),
+    }),
+  )
   update(
     @Param('id') id: string,
-    @Body()
-    updateUser: // new ValidationPipe()
-    UpdateUsersDto,
+    @Body() updateUser: UpdateUsersDto,
     @UploadedFile() file,
-  ) {
-    return this.usersService.update(id, {
-      ...updateUser,
-      avatar: file.path,
-    });
+  ): Promise<User> {
+    if (file) {
+      updateUser.avatar = file.path;
+    }
+    return this.usersService.update(id, updateUser);
   }
 
   @Post('/userName')

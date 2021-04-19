@@ -2,17 +2,45 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Friend, FriendDocument } from '../schemas/friend.schema';
+import { User, UserDocument } from '../schemas/user.schema';
+import * as mongoose from 'mongoose';
 
 @Injectable()
 export class FriendService {
   constructor(
     @InjectModel(Friend.name) private friendModel: Model<FriendDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async getAll(id): Promise<any> {
-    return this.friendModel.find({
-      $or: [{ user: id }, { userTwo: id }],
-    });
+    return this.friendModel
+      .aggregate([
+        {
+          $match: {
+            $or: [
+              { user: mongoose.Types.ObjectId(id) },
+              { userTwo: mongoose.Types.ObjectId(id) },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'user',
+            foreignField: '_id',
+            as: 'friend',
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userTwo',
+            foreignField: '_id',
+            as: 'friendTwo',
+          },
+        },
+      ])
+      .exec();
   }
 
   async create(body): Promise<any> {

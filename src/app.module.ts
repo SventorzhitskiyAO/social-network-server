@@ -9,11 +9,17 @@ import { PostModule } from './post/post.module';
 import { FriendModule } from './friend/friend.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { MusicModule } from './music/music.module';
+import { AppGateway } from './app.gateway';
+import { PhotoModule } from './photo/photo.module';
+import { AlbumModule } from './album/album.module';
+import { DialogModule } from './dialog/dialog.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: join(__dirname, '..'),
     }),
     AuthModule,
     UsersModule,
@@ -23,8 +29,13 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       isGlobal: true,
     }),
     FriendModule,
+    MusicModule,
+    PhotoModule,
+    AlbumModule,
+    DialogModule,
+    MessageModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppGateway],
 })
 export class AppModule {}

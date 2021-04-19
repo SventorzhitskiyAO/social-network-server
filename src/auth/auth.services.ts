@@ -32,10 +32,9 @@ export class AuthServices {
     login: string,
     password: string,
   ): Promise<UserDto> {
-    let user = await this.userModel.findOne({ login: login });
-    if (!user) {
-      user = await this.userModel.findOne({ email: login });
-    }
+    const user = await this.userModel.findOne({
+      $or: [{ login: login }, { email: login }],
+    });
     const loginTrue = bcrypt.compareSync(password, user.password);
     if (loginTrue) {
       return user;

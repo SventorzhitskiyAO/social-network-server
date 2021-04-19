@@ -12,7 +12,6 @@ export class PostController {
   @Get(':id')
   @ApiResponse({
     status: 200,
-    description: 'OK',
     type: [PostDto],
   })
   get(@Param('id') id: string): Promise<PostDto[]> {
@@ -25,7 +24,6 @@ export class PostController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Create post',
     type: PostDto,
   })
   create(@Body() post: CreatePostDto): Promise<PostDto> {
@@ -33,6 +31,9 @@ export class PostController {
   }
 
   @Delete(':id')
+  @ApiBody({
+    type: PostDto,
+  })
   remove(@Param('id') id: string): Promise<PostDto> {
     return this.postService.remove(id);
   }
